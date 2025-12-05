@@ -1,14 +1,683 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>rediaz index</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rediaz · 科技感主页</title>
+  <!-- 字体 & 图标 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-deep: #0A0E17;
+      --bg-card: #121826;
+      --primary: #00F0FF;
+      --accent: #00FF9D;
+      --text-main: #FFFFFF;
+      --text-muted: #8A94A6;
+      --shadow: 0 10px 30px rgba(0, 240, 255, 0.12);
+      --spacing: 8px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', 'Roboto Mono', '思源黑体', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-main);
+      line-height: 1.6;
+      scroll-behavior: smooth;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .container {
+      width: min(1200px, 92vw);
+      margin: 0 auto;
+    }
+
+    /* 导航 */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      z-index: 999;
+      padding: 16px 0;
+      background: transparent;
+      transition: all .3s ease;
+    }
+    .navbar.active {
+      background: #121826;
+      box-shadow: 0 2px 20px rgba(0, 240, 255, 0.1);
+    }
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--primary);
+      font-family: 'Roboto Mono', monospace;
+    }
+    .code-sign { color: var(--accent); }
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .nav-item {
+      padding: 10px 14px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-weight: 500;
+      transition: all .3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-item:hover { color: var(--accent); background: rgba(0, 240, 255, 0.05); }
+    .cta-btn {
+      padding: 10px 18px;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      border-radius: 6px;
+      transition: all .3s ease;
+    }
+    .cta-btn:hover { color: var(--accent); border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-2px); }
+    .menu-btn {
+      display: none;
+      background: none;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      padding: 140px 0 120px;
+      overflow: hidden;
+    }
+    .code-rain-bg {
+      position: absolute;
+      inset: 0;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .hero-content {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+    .terminal-box {
+      width: 100%;
+      max-width: 900px;
+      background: var(--bg-deep);
+      border: 1px solid var(--primary);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.12);
+      backdrop-filter: blur(4px);
+    }
+    .terminal-header {
+      background: var(--bg-card);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+    }
+    .terminal-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+    }
+    .dot-red { background: #FF5F56; }
+    .dot-yellow { background: #FFBD2E; }
+    .dot-green { background: #27C93F; }
+    .terminal-title {
+      color: var(--text-muted);
+      font-family: 'Roboto Mono', monospace;
+      font-size: 14px;
+    }
+    .terminal-output {
+      padding: 24px;
+      min-height: 320px;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+    .prompt { color: var(--accent); margin-right: 8px; }
+    .output { color: var(--primary); }
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      background: var(--accent);
+      margin-left: 4px;
+      animation: blink 1s step-start infinite;
+    }
+    .terminal-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 0 24px 24px;
+    }
+    .terminal-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 0;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Section base */
+    section {
+      padding: 80px 0;
+      position: relative;
+    }
+    .section-title {
+      text-align: center;
+      font-size: clamp(24px, 3vw, 32px);
+      color: var(--text-main);
+      margin-bottom: 32px;
+      letter-spacing: 0.5px;
+    }
+    .section-title .code-sign { margin: 0 8px; }
+    .section-sub {
+      text-align: center;
+      color: var(--text-muted);
+      max-width: 780px;
+      margin: 0 auto 32px;
+    }
+
+    /* Skills */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .skill-card {
+      background: var(--bg-card);
+      border-radius: 8px;
+      padding: 24px;
+      border-left: 3px solid var(--primary);
+      transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+    .skill-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: var(--accent); }
+    .skill-card i {
+      color: var(--primary);
+      font-size: 24px;
+    }
+    .skill-title {
+      margin: 12px 0;
+      font-size: 20px;
+    }
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .skill-tags span {
+      background: rgba(0, 240, 255, 0.1);
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #232C3F;
+      border-radius: 4px;
+      margin-top: 16px;
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      background: linear-gradient(90deg, #00F0FF, #00FF9D);
+    }
+
+    /* Projects */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .project-card {
+      background: var(--bg-card);
+      border-radius: 8px;
+      padding: 24px;
+      transition: all .3s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+    .project-card:hover { box-shadow: 0 0 30px rgba(0, 255, 157, 0.08); transform: translateY(-4px); }
+    .project-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+    .project-title { margin: 0; font-size: 20px; }
+    .project-desc { color: var(--text-muted); font-size: 14px; }
+    .code-preview {
+      background: var(--bg-deep);
+      padding: 16px;
+      border-radius: 4px;
+      margin: 16px 0;
+      overflow-x: auto;
+      border: 1px solid rgba(0, 240, 255, 0.1);
+    }
+    .code-preview code {
+      color: var(--text-muted);
+      font-family: 'Roboto Mono', monospace;
+      font-size: 12px;
+      display: block;
+      white-space: pre;
+    }
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0;
+    }
+    .project-tags span {
+      background: rgba(0, 240, 255, 0.1);
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+    }
+    .project-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--primary);
+      font-weight: 600;
+      transition: color .3s ease, transform .3s ease;
+    }
+    .project-link:hover { color: var(--accent); transform: translateX(4px); }
+
+    /* About & Contact */
+    .about {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      align-items: center;
+    }
+    .about-card, .contact-card {
+      background: var(--bg-card);
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      border: 1px solid rgba(0, 240, 255, 0.12);
+    }
+    .about-card h3, .contact-card h3 { margin-top: 0; }
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      background: rgba(0, 255, 157, 0.12);
+      color: var(--accent);
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+    .contact-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .contact-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-muted);
+    }
+    .contact-item i { color: var(--primary); }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-deep);
+      padding: 48px 0 24px;
+      margin-top: 48px;
+      border-top: 1px solid rgba(0, 240, 255, 0.08);
+    }
+    .footer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .social-links {
+      display: flex;
+      gap: 16px;
+    }
+    .social-links a {
+      color: var(--text-muted);
+      font-size: 20px;
+      transition: color .3s ease;
+    }
+    .social-links a:hover { color: var(--accent); }
+    .footer-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #00F0FF, transparent);
+      margin: 24px 0;
+    }
+    .footer-bottom p {
+      color: var(--text-muted);
+      text-align: center;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    /* Reveal animations */
+    .reveal { opacity: 0; transform: translateY(20px); transition: all .6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none;
+        position: absolute;
+        top: 68px; left: 0;
+        width: 100%;
+        background: #121826;
+        padding: 24px 16px;
+        flex-direction: column;
+        gap: 16px;
+        border-top: 1px solid rgba(0, 240, 255, 0.1);
+      }
+      .nav-menu.active { display: flex; }
+      .menu-btn { display: block; }
+      .hero { padding: 120px 0 80px; }
+      .terminal-output { font-size: 14px; }
+      section { padding: 64px 0; }
+    }
+  </style>
 </head>
 <body>
-    
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a class="logo" href="#home"><span class="code-sign">&lt;/&gt;</span>Rediaz</a>
+      <div class="nav-menu" id="navMenu">
+        <a href="#home" class="nav-item"><i class="fa-solid fa-terminal"></i> 首页</a>
+        <a href="#about" class="nav-item"><i class="fa-solid fa-user-astronaut"></i> 关于我</a>
+        <a href="#skills" class="nav-item"><i class="fa-solid fa-code"></i> 技能</a>
+        <a href="#projects" class="nav-item"><i class="fa-solid fa-folder-open"></i> 项目</a>
+        <a href="#contact" class="nav-item cta-btn">联系我</a>
+      </div>
+      <button class="menu-btn" id="menuBtn"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </nav>
 
-    <p>rediaz 的个人页面</p>
+  <section id="home" class="hero">
+    <div class="code-rain-bg">
+      <canvas id="code-rain"></canvas>
+    </div>
+    <div class="container hero-content">
+      <div class="terminal-box">
+        <div class="terminal-header">
+          <span class="terminal-dot dot-red"></span>
+          <span class="terminal-dot dot-yellow"></span>
+          <span class="terminal-dot dot-green"></span>
+          <span class="terminal-title">user@rediaz-dev: ~$</span>
+        </div>
+        <div class="terminal-output" id="terminalOutput">
+          <p><span class="prompt">>></span><span class="line"></span><span class="cursor"></span></p>
+        </div>
+        <div class="terminal-actions">
+          <a href="#projects" class="cta-btn terminal-btn"><span class="code-sign">&lt;</span> 查看项目 <span class="code-sign">&gt;</span></a>
+          <a href="#contact" class="cta-btn terminal-btn"><i class="fa-solid fa-envelope"></i> 联系我</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="container">
+      <h2 class="section-title"><span class="code-sign">//</span> 关于我 <span class="code-sign">//</span></h2>
+      <div class="section-sub">全栈开发者，热爱构建高性能的 Web 与移动端体验，关注工程化、设计体系与极客美学。</div>
+      <div class="about">
+        <div class="about-card reveal">
+          <span class="badge">Profile</span>
+          <h3>红迪 Rediaz</h3>
+          <p>专注 JavaScript / React / Node.js / Docker，具备从设计到上线的端到端交付能力。喜欢把代码当作品打磨，也乐于用技术创造可感知的美。</p>
+          <div class="skill-tags">
+            <span>Full-stack</span>
+            <span>Web Performance</span>
+            <span>UI Engineering</span>
+            <span>DevOps</span>
+          </div>
+        </div>
+        <div class="about-card reveal">
+          <span class="badge">Highlights</span>
+          <ul style="padding-left: 18px; color: var(--text-muted); margin: 12px 0 0;">
+            <li>设计 & 开发统一：用统一设计语言落地交互和动效。</li>
+            <li>工程化：自动化构建、CI/CD、性能监控与可视化。</li>
+            <li>体验优先：移动端响应式、动画节奏、极简导航。</li>
+            <li>安全与质量：代码规范、单测与端到端验证。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="container">
+      <h2 class="section-title"><span class="code-sign">//</span> 技术栈 <span class="code-sign">//</span></h2>
+      <div class="skills-grid">
+        <div class="skill-card reveal">
+          <i class="fa-solid fa-code"></i>
+          <h3 class="skill-title">前端开发</h3>
+          <div class="skill-tags">
+            <span>React</span><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span>
+          </div>
+          <div class="progress-bar"><div class="progress" style="width: 90%"></div></div>
+        </div>
+        <div class="skill-card reveal">
+          <i class="fa-solid fa-server"></i>
+          <h3 class="skill-title">后端 & 云原生</h3>
+          <div class="skill-tags">
+            <span>Node.js</span><span>Express</span><span>Docker</span><span>PostgreSQL</span>
+          </div>
+          <div class="progress-bar"><div class="progress" style="width: 82%"></div></div>
+        </div>
+        <div class="skill-card reveal">
+          <i class="fa-solid fa-robot"></i>
+          <h3 class="skill-title">工程化 & 自动化</h3>
+          <div class="skill-tags">
+            <span>CI/CD</span><span>Testing</span><span>Lint/Format</span><span>Monitoring</span>
+          </div>
+          <div class="progress-bar"><div class="progress" style="width: 76%"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="container">
+      <h2 class="section-title"><span class="code-sign">{}</span> 项目作品 <span class="code-sign">{}</span></h2>
+      <div class="projects-grid">
+        <div class="project-card reveal">
+          <div class="project-header">
+            <i class="fa-solid fa-folder-code"></i>
+            <h3 class="project-title">电商管理系统</h3>
+          </div>
+          <div class="project-desc">React + Node.js 的全栈后台，支持商品管理、订单统计、权限控制，接入持续交付管线。</div>
+          <pre class="code-preview"><code>// 核心功能示例
+const handleOrderSubmit = async (data) => {
+  const res = await axios.post('/api/orders', data);
+  if (res.code === 200) message.success('订单提交成功');
+};</code></pre>
+          <div class="project-tags"><span>React</span><span>Node.js</span><span>MySQL</span></div>
+          <a class="project-link" href="#"><span class="code-sign">&lt;/&gt;</span> 查看详情 <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="project-card reveal">
+          <div class="project-header">
+            <i class="fa-solid fa-database"></i>
+            <h3 class="project-title">实时数据看板</h3>
+          </div>
+          <div class="project-desc">基于 WebSocket 的实时监控大屏，包含业务指标、告警与性能洞察，支持深色主题与响应式布局。</div>
+          <pre class="code-preview"><code>// 数据流示例
+socket.on('metrics', (payload) => {
+  renderChart(payload);
+  updateAlerts(payload);
+});</code></pre>
+          <div class="project-tags"><span>TypeScript</span><span>WebSocket</span><span>Chart.js</span></div>
+          <a class="project-link" href="#"><span class="code-sign">&lt;/&gt;</span> 查看详情 <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="project-card reveal">
+          <div class="project-header">
+            <i class="fa-solid fa-mobile-screen"></i>
+            <h3 class="project-title">移动端设计系统</h3>
+          </div>
+          <div class="project-desc">为移动端产品打造的设计系统，含组件库、动效节奏与主题切换，提升研发与设计一致性。</div>
+          <pre class="code-preview"><code>// 主题切换示例
+const toggleTheme = () => {
+  document.body.classList.toggle('light');
+};</code></pre>
+          <div class="project-tags"><span>Design System</span><span>Motion</span><span>Theme</span></div>
+          <a class="project-link" href="#"><span class="code-sign">&lt;/&gt;</span> 查看详情 <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <h2 class="section-title"><span class="code-sign">&lt;/&gt;</span> 联系我 <span class="code-sign">&lt;/&gt;</span></h2>
+      <div class="section-sub">有项目合作、咨询或任何想法，欢迎随时联系我。</div>
+      <div class="contact-card reveal">
+        <h3>Let's build something great.</h3>
+        <div class="contact-list">
+          <span class="contact-item"><i class="fa-solid fa-envelope"></i> rediaz@example.com</span>
+          <span class="contact-item"><i class="fa-brands fa-github"></i> github.com/rediaz</span>
+          <span class="contact-item"><i class="fa-brands fa-linkedin"></i> linkedin.com/in/rediaz</span>
+        </div>
+        <div style="margin-top: 16px;">
+          <a class="cta-btn" href="mailto:rediaz@example.com">发送邮件</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <a class="logo" href="#home"><span class="code-sign">&lt;/&gt;</span>Rediaz</a>
+        <div class="social-links">
+          <a href="#"><i class="fa-brands fa-github"></i></a>
+          <a href="#"><i class="fa-solid fa-envelope"></i></a>
+          <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+        </div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+        <p>© 2025 Rediaz. All rights reserved. <span class="code-sign">// Built with HTML/CSS/JS</span></p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // 导航滚动态 & 移动菜单
+    const nav = document.getElementById('navbar');
+    const navMenu = document.getElementById('navMenu');
+    const menuBtn = document.getElementById('menuBtn');
+    const toggleNav = () => {
+      if (window.scrollY > 50) nav.classList.add('active');
+      else nav.classList.remove('active');
+    };
+    toggleNav();
+    window.addEventListener('scroll', toggleNav);
+    menuBtn.addEventListener('click', () => navMenu.classList.toggle('active'));
+    navMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navMenu.classList.remove('active')));
+
+    // 代码雨 Canvas
+    const canvas = document.getElementById('code-rain');
+    const ctx = canvas.getContext('2d');
+    let drops = [];
+    const initCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      drops = [];
+      for (let x = 0; x < canvas.width / 20; x++) {
+        drops.push({ x: x * 20, y: Math.random() * -canvas.height, speed: 2 + Math.random() * 3 });
+      }
+    };
+    const drawRain = () => {
+      ctx.fillStyle = 'rgba(10, 14, 23, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(0, 255, 157, 0.6)';
+      ctx.font = '16px Roboto Mono';
+      drops.forEach(drop => {
+        const text = Math.random() > 0.5 ? '0' : '1';
+        ctx.fillText(text, drop.x, drop.y);
+        drop.y += drop.speed;
+        if (drop.y > canvas.height) drop.y = Math.random() * -canvas.height;
+      });
+      requestAnimationFrame(drawRain);
+    };
+    window.addEventListener('resize', initCanvas);
+    initCanvas();
+    requestAnimationFrame(drawRain);
+
+    // 打字机效果
+    const terminalOutput = document.getElementById('terminalOutput');
+    const lines = [
+      'print("Hello, I\\'m Rediaz")',
+      '输出：全栈开发工程师 | 专注 Web & 移动端开发',
+      'print("Core Tech Stack")',
+      '输出：JavaScript / React / Node.js / Docker',
+    ];
+    let lineIndex = 0;
+    let charIndex = 0;
+    let currentParagraph = terminalOutput.querySelector('.line');
+    const cursor = terminalOutput.querySelector('.cursor');
+    const typeSpeed = 40;
+    const typeLine = () => {
+      if (lineIndex >= lines.length) return;
+      const currentLine = lines[lineIndex];
+      if (charIndex <= currentLine.length) {
+        currentParagraph.textContent = currentLine.slice(0, charIndex);
+        charIndex++;
+        setTimeout(typeLine, typeSpeed);
+      } else {
+        lineIndex++;
+        charIndex = 0;
+        const newP = document.createElement('p');
+        const prompt = document.createElement('span');
+        prompt.className = 'prompt';
+        prompt.textContent = '>>';
+        const lineSpan = document.createElement('span');
+        lineSpan.className = 'line';
+        newP.appendChild(prompt);
+        newP.appendChild(lineSpan);
+        terminalOutput.insertBefore(newP, cursor.parentElement);
+        currentParagraph = lineSpan;
+        setTimeout(typeLine, 400);
+      }
+    };
+    setTimeout(typeLine, 400);
+
+    // IntersectionObserver reveal
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
 </body>
 </html>
