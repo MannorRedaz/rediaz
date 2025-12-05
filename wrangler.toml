@@ -1,0 +1,3 @@
+name = "rediaz-home"
+compatibility_date = "2025-12-05"
+assets = { directory = "public" }
