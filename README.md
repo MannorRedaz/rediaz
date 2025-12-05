@@ -1,0 +1,2 @@
+# rediaz
+rediaz index page
